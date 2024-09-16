@@ -1,0 +1,47 @@
+version: '3.2'
+
+services:
+
+  nginx:
+    container_name: test-nginx
+    image: nginx:latest
+    ports:
+      - '8080:80'
+    volumes:
+      - ./docker/nginx/conf:/etc/nginx/conf.d
+      - ./:/var/www/test
+      - ./docker/nginx/log:/var/log/nginx
+    links:
+      - php
+
+  php:
+    container_name: test-php
+    build: ./docker/php
+    environment:
+      PROJECT_DIR: /var/www/test
+      PHP_IDE_CONFIG: "serverName=Docker"
+    volumes:
+      - ./:/var/www/test
+    links:
+      - mysql
+    depends_on:
+      - mysql
+
+  mysql:
+    container_name: test-mysql
+    image: mysql:8.0
+    ports:
+      - '33064:3306'
+    environment:
+      - MYSQL_ROOT_PASSWORD=verysecret
+      - MYSQL_DATABASE=test
+      - MYSQL_USER=test
+      - MYSQL_PASSWORD=test
+    command:
+      --sql_mode=STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION
+    volumes:
+      - test-db-vol:/var/lib/mysql
+      - ./docker/mysql/init.sql:/docker-entrypoint-initdb.d/init.sql
+
+volumes:
+  test-db-vol:
