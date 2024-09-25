@@ -61,4 +61,15 @@ class ApiController extends Controller
             }
         });
     }
+
+    public function post(): array
+    {
+        if (Yii::$app->request->isPost) {
+            if (Yii::$app->request->getHeaders()->get('content-type') === 'application/json') {
+                return json_decode(Yii::$app->request->getRawBody(), true);
+            } else {
+                return Yii::$app->request->post();
+            }
+        }
+    }
 }

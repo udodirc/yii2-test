@@ -60,6 +60,7 @@ $config = [
             'rules' => [
                 '' => 'patientss/index',
                 'GET api/patients' => 'api/patients/index',
+                'POST api/patients' => 'api/patients/create',
             ],
         ],
 

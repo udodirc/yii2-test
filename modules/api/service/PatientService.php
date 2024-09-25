@@ -3,10 +3,12 @@
 namespace app\modules\api\service;
 
 use app\models\Patient;
+use app\models\User;
+use app\modules\api\forms\CreatePatientForm;
 use app\modules\api\forms\PatientForm;
 use app\modules\api\mappers\ServicePatientMapper;
-use app\modules\service\mappers\ServiceModificationMapper;
 use Exception;
+use Yii;
 use yii\base\Model;
 
 class PatientService
@@ -36,6 +38,35 @@ class PatientService
             ->all();
 
         return ServicePatientMapper::mapAll($patients);
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function create(array $params)
+    {
+        $form = new CreatePatientForm();
+        $model = new Patient();
+        $user = User::findOne(Yii::$app->user->id);
+
+        $this->validate($params, $form);
+        $model->setAttributes($params);
+
+//        if (!Yii::$app->user->isSuperadmin) {
+//            $model->polyclinic_id = $user->polyclinic_id;
+//        }
+
+        $model->created_by = \Yii::$app->user->id;
+        $model->updated_by = \Yii::$app->user->id;
+        $model->birthday = $form->birthday ? date("Y-m-d", strtotime($form->birthday)) : null;
+        $model->diagnosis_date = $form->diagnosis_date ? date("Y-m-d", strtotime($form->diagnosis_date)) : null;
+        $model->recovery_date = $form->recovery_date ? date("Y-m-d", strtotime($form->recovery_date)) : null;
+        $model->analysis_date = $form->analysis_date ? date("Y-m-d", strtotime($form->analysis_date)) : null;
+
+        $model->save(false);
+
+        return $model->attributes;
+
     }
 
     /**
