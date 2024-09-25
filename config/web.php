@@ -59,6 +59,8 @@ $config = [
             'showScriptName' => false,
             'rules' => [
                 '' => 'patientss/index',
+                'GET api/patients' => 'api/patients/index',
+                'POST api/patients' => 'api/patients/create',
             ],
         ],
 
@@ -83,6 +85,10 @@ $config = [
                     $event->action->controller->layout = 'loginLayout.php';
                 };
             },
+        ],
+        'api' => [
+            'basePath' => '@app/modules/api',
+            'class' => 'app\modules\api\Module',
         ],
     ],
     'params' => $params,
